@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medical Prescription App</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root {
+  --bg: #121212;
+  --panel: #1f1f1f;
+  --input: #1c262c;
+  --muted: #9ca7ac;
+  --accent: #3fe16b;
+  --accent-dark: #2cb54c;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  background: var(--bg);
+  color: #fff;
+}
+
+/* Shared Container */
+.container {
+  padding: 20px;
+  min-height: calc(100vh - 60px);
+  box-sizing: border-box;
+  max-width: 420px;
+  margin: auto;
+}
+
+/* --- Sign Up / Login Card --- */
+.card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+  padding: 18px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  margin-bottom: 20px;
+}
+
+h2 { font-size: 15px; font-weight: 600; color: var(--muted); margin-bottom: 15px; }
+
+.form-box {
+  background: var(--panel);
+  padding: 30px;
+  border-radius: 6px;
+  border: 1px solid rgba(0,0,0,0.5);
+}
+
+.field { margin-bottom: 12px; }
+label { display: block; font-size: 12px; margin-bottom: 6px; color: var(--muted); }
+input, select, textarea {
+  width: 100%;
+  background: var(--input);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 4px;
+  padding: 10px;
+  color: #eef5f6;
+  font-size: 13px;
+  outline: none;
+}
+textarea { resize: vertical; min-height: 65px; }
+.btn {
+  padding: 10px;
+  width: 100%;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+.btn-green { background: linear-gradient(180deg, var(--accent), var(--accent-dark)); color: #053612; }
+.btn-outline { background: transparent; color: var(--muted); border: 1px solid rgba(255,255,255,0.08); }
+
+.role-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.pill {
+  padding: 8px 12px;
+  border-radius: 30px;
+  background: rgba(255,255,255,0.05);
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.05);
+  font-size: 13px;
+  color: var(--muted);
+}
+.pill.active {
+  background: var(--accent);
+  border-color: rgba(0,0,0,0.3);
+  color: #053013;
+  font-weight: bold;
+}
+
+/* --- Dashboard Cards --- */
+.dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.card-dashboard {
+  background-color: #1f1f1f;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.card-dashboard:hover { transform: scale(1.05); }
+
+/* --- Prescriptions Page --- */
+.section { margin-bottom: 30px; }
+.section h2 { margin-bottom: 15px; font-size: 18px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+.prescription-item {
+  display: flex;
+  align-items: center;
+  background-color: #1f1f1f;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+.pill-icon {
+  width: 40px;
+  height: 40px;
+  background-color: #03a9f4;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* --- Reminders Page --- */
+.reminder-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1f1f1f;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+.reminder-info { display: flex; align-items: center; gap: 15px; }
+.reminder-time { background-color: #03a9f4; padding: 5px 12px; border-radius: 12px; font-weight: bold; }
+.toggle-button {
+  background-color: #03a9f4;
+  border: none;
+  border-radius: 20px;
+  width: 50px;
+  height: 25px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.toggle-button::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 21px;
+  height: 21px;
+  background-color: #fff;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+.toggle-button.active { background-color: #4caf50; }
+.toggle-button.active::after { transform: translateX(25px); }
+
+/* --- Profile Page --- */
+.profile-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.logout-button {
+  background-color: #e53935; color: #fff; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 16px; transition: background-color 0.2s;
+}
+.logout-button:hover { background-color: #d32f2f; }
+.user-email { font-size: 18px; color: #03a9f4; }
+
+/* --- Bottom Navigation --- */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  background-color: #1f1f1f;
+  padding: 10px 0;
+  border-top: 1px solid #333;
+}
+.bottom-nav div {
+  text-align: center;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.bottom-nav div i { font-size: 20px; margin-bottom: 3px; }
+.bottom-nav div.active { color: #03a9f4; }
+
+/* Hide pages by default */
+.page { display: none; }
+.page.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- Sign Up / Login Page -->
+<div class="container page active" id="authPage">
+  <div class="card">
+    <div class="form-box">
+      <h2>Medication Prescription Tracker</h2>
+      <div class="role-pills" id="rolePills">
+        <div class="pill active" data-role="Patient">Patient</div>
+        <div class="pill" data-role="Doctor">Doctor</div>
+        <div class="pill" data-role="Pharmacy">Pharmacy</div>
+        <div class="pill" data-role="Admin">Admin</div>
+      </div>
+
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <button class="btn btn-green" id="signUpBtn">Sign Up</button>
+        <button class="btn btn-outline" id="loginBtn">Login</button>
+      </div>
+
+      <form id="profileForm">
+        <div class="field" id="nameField">
+          <label>Full Name</label>
+          <input type="text" id="name">
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="email" required>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="password" required>
+        </div>
+        <div class="field">
+          <label>Role</label>
+          <select id="roleSelect">
+            <option>Patient</option>
+            <option>Doctor</option>
+            <option>Pharmacy</option>
+            <option>Admin</option>
+          </select>
+        </div>
+        <div id="extraFields"></div>
+        <button class="btn btn-green" id="mainAction">Sign Up</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Dashboard Page -->
+<div id="dashboardPage" class="page container">
+  <div class="dashboard">
+    <div class="card-dashboard" onclick="goToPrescriptions()">Doctor</div>
+    <div class="card-dashboard" onclick="goToPrescriptions()">Patient</div>
+    <div class="card-dashboard" onclick="goToPrescriptions()">Pharmacy</div>
+    <div class="card-dashboard" onclick="goToPrescriptions()">Admin</div>
+  </div>
+</div>
+
+<!-- Prescriptions Page -->
+<div id="prescriptionsPage" class="page container">
+  <h1>Prescriptions</h1>
+  <div class="section">
+    <h2>Active Prescriptions</h2>
+    <div class="prescription-item"><div class="pill-icon">A</div>Antibiotic – Amoxicillin 500mg</div>
+    <div class="prescription-item"><div class="pill-icon">P</div>Pain Relief – Ibuprofen 200mg</div>
+    <div class="prescription-item"><div class="pill-icon">B</div>Blood Pressure – Lisinopril 10mg</div>
+  </div>
+  <div class="section">
+    <h2>Past Prescriptions</h2>
+    <div class="prescription-item"><div class="pill-icon">D</div>Diabetes – Metformin 500mg</div>
+    <div class="prescription-item"><div class="pill-icon">C</div>Cholesterol – Atorvastatin 20mg</div>
+  </div>
+</div>
+
+<!-- Reminders Page -->
+<div id="remindersPage" class="page container">
+  <h1>Reminders</h1>
+  <div class="reminder-item">
+    <div class="reminder-info"><i class="fa-solid fa-pills"></i> Amoxicillin 500mg</div>
+    <div>
+      <span class="reminder-time">09:00 AM</span>
+      <button class="toggle-button" onclick="toggleReminder(this)"></button>
+    </div>
+  </div>
+  <div class="reminder-item">
+    <div class="reminder-info"><i class="fa-solid fa-pills"></i> Ibuprofen 200mg</div>
+    <div>
+      <span class="reminder-time">01:00 PM</span>
+      <button class="toggle-button" onclick="toggleReminder(this)"></button>
+    </div>
+  </div>
+  <div class="reminder-item">
+    <div class="reminder-info"><i class="fa-solid fa-pills"></i> Lisinopril 10mg</div>
+    <div>
+      <span class="reminder-time">08:00 PM</span>
+      <button class="toggle-button" onclick="toggleReminder(this)"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Profile Page -->
+<div id="profilePage" class="page container">
+  <h1>Profile</h1>
+  <div class="profile-container">
+    <div class="user-email" id="userEmail"></div>
+    <button class="logout-button" onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+  <div id="navDashboard" onclick="showPage('dashboard')"><i class="fa-solid fa-house"></i><span>Dashboard</span></div>
+  <div id="navPrescriptions" onclick="showPage('prescriptions')"><i class="fa-solid fa-file-prescription"></i><span>Prescriptions</span></div>
+  <div id="navReminders" onclick="showPage('reminders')"><i class="fa-solid fa-bell"></i><span>Reminders</span></div>
+  <div id="navProfile" onclick="showPage('profile')"><i class="fa-solid fa-user"></i><span>Profile</span></div>
+</div>
+
+<script>
+// Sign Up / Login Logic
+const roleSelect = document.getElementById("roleSelect");
+const extraFields = document.getElementById("extraFields");
+const pills = document.querySelectorAll(".pill");
+const mainAction = document.getElementById("mainAction");
+const nameField = document.getElementById("nameField");
+let mode = "signup";
+let loggedInEmail = "";
+
+pills.forEach(pill => {
+  pill.onclick = () => {
+    pills.forEach(p => p.classList.remove("active"));
+    pill.classList.add("active");
+    roleSelect.value = pill.dataset.role;
+    renderExtraFields(roleSelect.value);
+  };
+});
+
+roleSelect.onchange = () => {
+  pills.forEach(p => p.classList.remove("active"));
+  document.querySelector(`.pill[data-role="${roleSelect.value}"]`).classList.add("active");
+  renderExtraFields(roleSelect.value);
+};
+
+document.getElementById("signUpBtn").onclick = () => {
+  mode = "signup";
+  mainAction.textContent = "Sign Up";
+  nameField.style.display = "block";
+};
+
+document.getElementById("loginBtn").onclick = () => {
+  mode = "login";
+  mainAction.textContent = "Login";
+  nameField.style.display = "none";
+  extraFields.innerHTML = "";
+};
+
+function renderExtraFields(role) {
+  extraFields.innerHTML = "";
+  if (mode === "login") return;
+  if (role === "Doctor") {
+    extraFields.innerHTML = `
+      <div class="field"><label>Medical License Number</label><input></div>
+      <div class="field"><label>Specialization</label><input></div>
+    `;
+  } else if (role === "Pharmacy") {
+    extraFields.innerHTML = `
+      <div class="field"><label>Pharmacy License Number</label><input></div>
+      <div class="field"><label>Address</label><textarea></textarea></div>
+    `;
+  }
+}
+
+// Main App Logic
+document.getElementById("mainAction").onclick = (e) => {
+  e.preventDefault();
+  const emailInput = document.getElementById("email").value;
+  if (!emailInput) return alert("Please enter email");
+  loggedInEmail = emailInput;
+  document.getElementById("userEmail").innerText = loggedInEmail;
+  showPage('dashboard');
+};
+
+function goToPrescriptions() { showPage('prescriptions'); }
+
+function showPage(page) {
+  const pages = {
+    auth: document.getElementById('authPage'),
+    dashboard: document.getElementById('dashboardPage'),
+    prescriptions: document.getElementById('prescriptionsPage'),
+    reminders: document.getElementById('remindersPage'),
+    profile: document.getElementById('profilePage')
+  };
+  const navItems = {
+    dashboard: document.getElementById('navDashboard'),
+    prescriptions: document.getElementById('navPrescriptions'),
+    reminders: document.getElementById('navReminders'),
+    profile: document.getElementById('navProfile')
+  };
+  for (const key in pages) pages[key].classList.remove('active');
+  for (const key in navItems) navItems[key].classList.remove('active');
+  if(page !== 'auth') document.querySelector('.bottom-nav').style.display = 'flex';
+  else document.querySelector('.bottom-nav').style.display = 'none';
+  pages[page].classList.add('active');
+  if(navItems[page]) navItems[page].classList.add('active');
+}
+
+function logout() { showPage('auth'); }
+
+function toggleReminder(button) { button.classList.toggle('active'); }
+</script>
+
+</body>
+</html>
